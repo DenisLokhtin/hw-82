@@ -1,25 +1,25 @@
 const express = require('express');
-const mysqlDb = require('../mysqlDb')
+const Album = require('../models/Album');
 
 const router = express.Router();
 
 const upload = require('./routesConfig');
 
-router.get('/items', async (req, res) => {
-        const [resources] = await mysqlDb.getConnection().query(
-            'SELECT id, locations_id, categories_id, name FROM items',
-            [req.params.name]);
-        res.send(resources);
+router.get('/', async (req, res) => {
+    const [resources] = await mysqlDb.getConnection().query(
+        'SELECT id, locations_id, categories_id, name FROM items',
+        [req.params.name]);
+    res.send(resources);
 });
 
-router.get('/items/:id', async (req, res) => {
+router.get('/:id', async (req, res) => {
     const [resources] = await mysqlDb.getConnection().query(
-        `SELECT * FROM items where id = ?`,
+            `SELECT * FROM items where id = ?`,
         [req.params.id]);
     res.send(resources[0]);
 });
 
-router.post('/items', upload.single('file'), async (req, res) => {
+router.post('/', upload.single('file'), async (req, res) => {
     const body = {
         name: req.body.name,
         description: req.body.description,
@@ -29,7 +29,7 @@ router.post('/items', upload.single('file'), async (req, res) => {
 
     if (req.file) {
         body.file = req.file.filename;
-    };
+    }
 
     console.log(req.file);
 
@@ -39,11 +39,11 @@ router.post('/items', upload.single('file'), async (req, res) => {
 
     res.send({
         ...body,
-        id: newResources.insertId
-    });
+        id: newResources[0].insertId
+    })
 });
 
-router.put('/items/:id', upload.single('file'), async (req, res) => {
+router.put('/:id', upload.single('file'), async (req, res) => {
     const body = {
         name: req.body.name,
         description: req.body.description,
@@ -54,26 +54,20 @@ router.put('/items/:id', upload.single('file'), async (req, res) => {
     if (req.file) {
         body.image = req.file.filename;
     }
-    ;
-
-    const updateResources = await mysqlDb.getConnection().query(
-        'UPDATE items SET ? WHERE id = ?',
-        [{...body}, req.params.id]);
 
     res.send({
         ...body
     });
 });
 
-router.delete('/items/:id', async (req, res) => {
+router.delete('/:id', async (req, res) => {
     try {
         const [resources] = await mysqlDb.getConnection().query(
-            `DELETE FROM items where id = ?`,
+                `DELETE FROM items where id = ?`,
             [req.params.id]);
         res.status(204);
     } catch (e) {
         res.status(400).send({"message": e.sqlMessage});
-        return
     }
 });
 

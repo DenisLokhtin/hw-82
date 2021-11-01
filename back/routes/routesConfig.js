@@ -1,6 +1,7 @@
 const multer = require('multer');
 const path = require('path');
 const config = require('../config');
+const mongoose = require('mongoose')
 
 const {nanoid} = require("nanoid");
 const ID = nanoid();
