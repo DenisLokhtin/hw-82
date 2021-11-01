@@ -14,20 +14,6 @@ router.get('/', async (req, res) => {
     }
 });
 
-router.get('/:id', async (req, res) => {
-    try {
-        const Artists = await Artist.findById(req.params.id);
-
-        if (Artists) {
-            res.send(Artists);
-        } else {
-            res.sendStatus(404).send({error: 'Artist not found'})
-        }
-    } catch (e) {
-        res.sendStatus(500);
-    }
-});
-
 router.post('/', upload.single('file'), async (req, res) => {
     const body = {
         title: req.body.title,

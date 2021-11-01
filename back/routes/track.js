@@ -5,7 +5,11 @@ const router = express.Router();
 
 router.get('/', async (req, res) => {
     try {
-        const Tracks = await Track.find();
+        const query = {};
+        if (req.query.album) {
+            query.album = req.query.album
+        }
+        const Tracks = await Track.find(query);
         res.send(Tracks);
     } catch (e) {
         res.sendStatus(500);
@@ -39,7 +43,7 @@ router.post('/', async (req, res) => {
         await tracks.save()
         res.send(tracks);
     } catch (e) {
-     res.sendStatus(400);
+        res.sendStatus(400);
     }
 });
 

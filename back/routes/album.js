@@ -7,7 +7,11 @@ const upload = require('./routesConfig');
 
 router.get('/', async (req, res) => {
     try {
-        const Albums = await Album.find();
+        const query = {};
+        if (req.query.artist) {
+            query.artist = req.query.artist;
+        }
+        const Albums = await Album.find(query);
         res.send(Albums);
     } catch (e) {
         res.sendStatus(500);
