@@ -15,9 +15,9 @@ const AlbumSchema = new Schema({
         type: Date,
         required: true,
     },
-    photo: {
+    file: {
         type: String,
-        required: true,
+        required: false,
     },
 });
 

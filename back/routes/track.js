@@ -4,57 +4,42 @@ const Track = require('../models/Track');
 const router = express.Router();
 
 router.get('/', async (req, res) => {
-    const [resources] = await mysqlDb.getConnection().query(
-        'SELECT id, name FROM categories');
-    res.send(resources);
+    try {
+        const Tracks = await Track.find();
+        res.send(Tracks);
+    } catch (e) {
+        res.sendStatus(500);
+    }
 });
 
 router.get('/:id', async (req, res) => {
-    const [resources] = await mysqlDb.getConnection().query(
-        `SELECT * FROM categories where id = ?`,
-        [req.params.id]);
-    res.send(resources[0]);
+    try {
+        const Tracks = await Track.findById(req.params.id);
+
+        if (Tracks) {
+            res.send(Tracks);
+        } else {
+            res.sendStatus(404).send({error: 'Tracks not found'})
+        }
+    } catch (e) {
+        res.sendStatus(500);
+    }
 });
 
 router.post('/', async (req, res) => {
     const body = {
-        name: req.body.name,
-        description: req.body.description,
+        title: req.body.title,
+        album: req.body.album,
+        duration: req.body.duration
     };
 
-    const newResources = await mysqlDb.getConnection().query(
-        'INSERT INTO categories (name, description) values (?, ?)',
-        [body.name, body.description]);
+    const tracks = new Track(body);
 
-    res.send({
-        ...body,
-        id: newResources.insertId
-    });
-});
-
-router.put('/:id', async (req, res) => {
-    const body = {
-        name: req.body.name,
-        description: req.body.description,
-    };
-
-    const updateResources = await mysqlDb.getConnection().query(
-        'UPDATE categories SET ? WHERE id = ?',
-        [{...body}, req.params.id]);
-
-    res.send({
-        ...body
-    });
-});
-
-router.delete('/:id', async (req, res) => {
     try {
-        const [resources] = await mysqlDb.getConnection().query(
-            `DELETE FROM categories where id = ?`,
-            [req.params.id]);
-        res.status(204);
+        await tracks.save()
+        res.send(tracks);
     } catch (e) {
-        res.status(400).send({"message": e.sqlMessage});
+     res.sendStatus(400);
     }
 });
 
